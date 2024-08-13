@@ -69,10 +69,14 @@ with ZipFile(file) as zipfile:
     data_df = pandas.read_csv(zipfile.open(csv_file), low_memory=False)
     #print(data_df)
 
+    #Uncomment next block to skip international results
+    #Remember to use lifters_spain variable instead
+    #Country is not really used, rather the federation
     #country = ["Spain"]
-    federation = ["AEP", "WRPF-Spain"]
-    lifters_spain = data_df[data_df.Federation.isin(federation)]
+    #federation = ["AEP", "WRPF-Spain"]
+    #lifters_spain = data_df[data_df.Federation.isin(federation)]
     #print(lifters_spain)
+
     columns_to_print = ["Name", "Age", "Division", "BodyweightKg",
                         "Best3SquatKg", "Best3BenchKg", "Best3DeadliftKg",
                         "TotalKg", "Place", "Dots", "Wilks", "Federation",
@@ -81,8 +85,8 @@ with ZipFile(file) as zipfile:
                         #"Bench1Kg",  "Bench2Kg", "Bench3Kg",
                         #"Deadlift1Kg", "Deadlift2Kg", "Deadlift3Kg",
                         "Date", "MeetCountry", "MeetTown", "MeetName"]
-    lifters_ids = [lifters_spain[lifters_spain.Name.str.contains(lifter)]
+    lifters_ids = [data_df[data_df.Name.str.contains(lifter)]
                    for lifter in lifters]
     for lifter in lifters_ids:
         if not lifter.empty:
-            print(lifter[columns_to_print].to_string(index=False))
+            print(lifter[columns_to_print].sort_values(["Name", "Date"]).to_string(index=False))
