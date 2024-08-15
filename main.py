@@ -6,6 +6,7 @@ import datetime
 from dateutil.parser import parse as parsedate
 from os.path import exists, getmtime
 import pytz
+from unidecode import unidecode
 try:
     from lifters import lifters
 except ModuleNotFoundError:
@@ -53,7 +54,10 @@ def get_data_df_from_zip(file):
 
 def get_lifters_data(data_df, lifters):
     """Look up the lifters in 'lifters' list into all the results from data_df """
-    return [data_df[data_df.Name.str.contains(lifter)] for lifter in lifters]
+    return [data_df[data_df.Name.str.contains(lifter)]
+            if not data_df[data_df.Name.str.contains(lifter)].empty
+            else data_df[data_df.Name.str.contains(unidecode(lifter))]
+            for lifter in lifters]
 
 def print_lifters_results(lifters_results, columns):
     """Print all results for the search omitting empty values"""
