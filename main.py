@@ -7,6 +7,7 @@ from dateutil.parser import parse as parsedate
 from os.path import exists, getmtime
 import pytz
 from unidecode import unidecode
+from time import time
 try:
     from lifters import lifters
 except ModuleNotFoundError:
@@ -93,7 +94,10 @@ else:
     urlretrieve(url_list_latest, file)
 
 #Get a pandas DF from the zipfile
+time_before_loading_df = time()
 data_df = get_data_df_from_zip(file)
+time_load_df = float('{:.2f}'.format(time() - time_before_loading_df))
+print(f"All results from database loaded into memory in {time_load_df} second(s)")
 
 #Uncomment next block to skip international results
 #Remember to use lifters_spain variable instead
@@ -103,7 +107,9 @@ data_df = get_data_df_from_zip(file)
 #lifters_spain = data_df[data_df.Federation.isin(federation)]
 #print(lifters_spain)
 
+time_before_search = time()
 lifters_results = get_lifters_data(data_df, lifters)
+time_search = float('{:.2f}'.format(time() - time_before_search))
 
 columns_to_print = ["Name", "Age", "Division", "BodyweightKg",
                     "Best3SquatKg", "Best3BenchKg", "Best3DeadliftKg",
@@ -114,3 +120,4 @@ columns_to_print = ["Name", "Age", "Division", "BodyweightKg",
                     #"Deadlift1Kg", "Deadlift2Kg", "Deadlift3Kg",
                     "Date", "MeetCountry", "MeetTown", "MeetName"]
 print_lifters_results(lifters_results, columns_to_print)
+print(f"All lifters requested searched in database in {time_search} (additional) second(s)")
