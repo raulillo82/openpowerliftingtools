@@ -8,10 +8,6 @@ from os.path import exists, getmtime
 import pytz
 from unidecode import unidecode
 from time import time
-try:
-    from lifters import lifters
-except ModuleNotFoundError:
-    missing_lifters()
 
 def missing_lifters():
     """
@@ -29,6 +25,11 @@ def missing_lifters():
     print("]")
     #Exit without running the actual program
     exit(1)
+
+try:
+    from lifters import lifters
+except ModuleNotFoundError:
+    missing_lifters()
 
 def get_file_remote_date(url):
     """Return date of the latest uploaded copy"""
