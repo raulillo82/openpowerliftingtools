@@ -68,8 +68,10 @@ def print_lifters_results(lifters_results, columns):
             print(lifter[columns].sort_values(["Name", "Date"]).to_string(index=False))
 
 #Some needed values, url with the zip and localfile name
-url_list_latest = "https://openpowerlifting.gitlab.io/opl-csv/files/openpowerlifting-latest.zip"
-file = "./openpowerlifting-latest.zip"
+#url_list_latest = "https://openpowerlifting.gitlab.io/opl-csv/files/openpowerlifting-latest.zip"
+url_list_latest = "https://openpowerlifting.gitlab.io/opl-csv/files/openipf-latest.zip"
+#file = "./openpowerlifting-latest.zip"
+file = "./openipf-latest.zip"
 
 #Check if file already exists on disk
 if exists(file):
