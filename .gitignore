@@ -1,4 +1,5 @@
 openpowerlifting-*/
 *.zip
+*.csv
 lifters*.py
 __pycache__/

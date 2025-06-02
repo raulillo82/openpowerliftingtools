@@ -8,6 +8,7 @@ from os.path import exists, getmtime
 import pytz
 from unidecode import unidecode
 from time import time
+import csv
 
 def missing_lifters():
     """
@@ -23,13 +24,32 @@ def missing_lifters():
     print('"Lifter2_name Lifter2_surname(s)",')
     print('"Lifter3_name Lifter3_surname(s)",')
     print("]")
+    #Tell users that the can also use a csv file
+    print("")
+    print("A CSV file can also be provided:")
+    print("It needs to be saved as 'lifters.csv'")
+    print("Each lifter to be listed in a row of the CSV")
+    print("Name before surname(s) for each lifter")
+    print("The full name may be contained in a single cell (single-column CSV)")
+    print("Or names and surnames separated in columns. Use comma as separator")
+    print("If the CSV file exists, the lifters.py file is ignored")
     #Exit without running the actual program
     exit(1)
 
-try:
-    from lifters import lifters
-except ModuleNotFoundError:
-    missing_lifters()
+csv_lifters_file = "lifters.csv"
+
+if exists(csv_lifters_file):
+
+    with open("lifters.csv", newline="") as csvfile:
+        reader = csv.reader(csvfile, delimiter=",", quotechar='"')
+        lifters = [" ".join(row) for row in reader]
+
+else:
+    try:
+        from lifters import lifters
+    except ModuleNotFoundError:
+        missing_lifters()
+
 
 def get_file_remote_date(url):
     """Return date of the latest uploaded copy"""
@@ -66,6 +86,22 @@ def print_lifters_results(lifters_results, columns):
     for lifter in lifters_results:
         if not lifter.empty:
             print(lifter[columns].sort_values(["Name", "Date"]).to_string(index=False))
+
+def export_lifters_data(lifters_results, filename, columns=[]):
+    with open(filename, "w") as file:
+        if not columns:
+            columns = list(lifters_results[0].columns.values)
+        #Write headers first:
+        write = csv.writer(file)
+        write.writerow(columns)
+    #Write actual results
+    for lifter in lifters_results:
+        if not lifter.empty:
+            lifter[columns].sort_values(["Name","Date"]).to_csv(filename,
+                                                                mode="a",
+                                                                encoding="utf-8",
+                                                                index=False,
+                                                                header=False)
 
 #Some needed values, url with the zip and localfile name
 #url_list_latest = "https://openpowerlifting.gitlab.io/opl-csv/files/openpowerlifting-latest.zip"
@@ -116,7 +152,7 @@ time_search = float('{:.2f}'.format(time() - time_before_search))
 
 columns_to_print = ["Name", "Age", "Division", "BodyweightKg",
                     "Best3SquatKg", "Best3BenchKg", "Best3DeadliftKg",
-                    "TotalKg", "Place", "Dots", "Wilks", "Federation",
+                    "TotalKg", "Place", "Goodlift", "Federation",
                     #Other possibly interesting data, omitted now:
                     #"Squat1Kg", "Squat2Kg", "Squat3Kg",
                     #"Bench1Kg",  "Bench2Kg", "Bench3Kg",
@@ -124,3 +160,7 @@ columns_to_print = ["Name", "Age", "Division", "BodyweightKg",
                     "Date", "MeetCountry", "MeetTown", "MeetName"]
 print_lifters_results(lifters_results, columns_to_print)
 print(f"All lifters requested searched in database in {time_search} (additional) second(s)")
+query_file = "query.csv"
+columns_to_print = []
+export_lifters_data(lifters_results, query_file, columns_to_print)
+print(f"Lifters data exported into 'query.csv' file")
