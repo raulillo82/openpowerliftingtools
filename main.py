@@ -103,35 +103,38 @@ def export_lifters_data(lifters_results, filename, columns=[]):
                                                                 index=False,
                                                                 header=False)
 
-#Some needed values, url with the zip and localfile name
-#url_list_latest = "https://openpowerlifting.gitlab.io/opl-csv/files/openpowerlifting-latest.zip"
-url_list_latest = "https://openpowerlifting.gitlab.io/opl-csv/files/openipf-latest.zip"
-#file = "./openpowerlifting-latest.zip"
-file = "./openipf-latest.zip"
+def get_or_refresh_file():
+    #Some needed values, url with the zip and localfile name
+    #url_list_latest = "https://openpowerlifting.gitlab.io/opl-csv/files/openpowerlifting-latest.zip"
+    url_list_latest = "https://openpowerlifting.gitlab.io/opl-csv/files/openipf-latest.zip"
+    #file = "./openpowerlifting-latest.zip"
+    file = "./openipf-latest.zip"
 
-#Check if file already exists on disk
-if exists(file):
-    print("File was already downloaded into disk")
+    #Check if file already exists on disk
+    if exists(file):
+        print("File was already downloaded into disk")
 
-    #Get date of the local copy
-    file_time = datetime.datetime.fromtimestamp(getmtime(file))
+        #Get date of the local copy
+        file_time = datetime.datetime.fromtimestamp(getmtime(file))
 
-    #Get date of the remote copy
-    url_date = get_file_remote_date(url_list_latest)
+        #Get date of the remote copy
+        url_date = get_file_remote_date(url_list_latest)
 
-    #Compare dates, if online is newer, download it
-    #Local file time needs to be localized for comparison, pytz.UTC is needed
-    if url_date > pytz.UTC.localize(file_time):
-        print("File date online was newer than the copy on disk, downloading again")
-        urlretrieve(url_list_latest, file)
-    #Otherwise, no need to redownload
+        #Compare dates, if online is newer, download it
+        #Local file time needs to be localized for comparison, pytz.UTC is needed
+        if url_date > pytz.UTC.localize(file_time):
+            print("File date online was newer than the copy on disk, downloading again")
+            urlretrieve(url_list_latest, file)
+        #Otherwise, no need to redownload
+        else:
+            print("File on disk was already the latest, no need to redownload")
+    #If file not in disk, download it
     else:
-        print("File on disk was already the latest, no need to redownload")
-#If file not in disk, download it
-else:
-    print("File not downloaded, downloading it")
-    urlretrieve(url_list_latest, file)
+        print("File not downloaded, downloading it")
+        urlretrieve(url_list_latest, file)
+    return file
 
+file = get_or_refresh_file()
 #Get a pandas DF from the zipfile
 time_before_loading_df = time()
 data_df = get_data_df_from_zip(file)
