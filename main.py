@@ -42,7 +42,7 @@ if exists(csv_lifters_file):
 
     with open("lifters.csv", newline="") as csvfile:
         reader = csv.reader(csvfile, delimiter=",", quotechar='"')
-        lifters = [" ".join(row) for row in reader]
+        lifters = [" ".join(row).strip() for row in reader]
 
 else:
     try:
